@@ -1,12 +1,13 @@
-
 import streamlit as st
 
 st.set_page_config(page_title="Cálculo de Nota", page_icon="📘")
 
 st.title("📘 Calculadora de Notas – Versão Mobile")
+st.markdown("Preencha somente as notas que você já recebeu. Marque a caixa antes de digitar a nota.")
 
 META = 70
 
+# Pesos oficiais
 PESOS = {
     "Prova Objetiva": 15,
     "Prova Dissertativa": 30,
@@ -22,22 +23,32 @@ PESOS = {
     "Interação": 2.5,
 }
 
-st.markdown("Preencha somente as notas que você já tem. Deixe em branco o que ainda não recebeu nota.")
-
 notas = {}
 total = 0
 pesos_abertos = {}
 
+st.subheader("Lançamento de Notas")
+
 for item, peso in PESOS.items():
-    nota = st.number_input(f"{item} (0 a 100)", min_value=0.0, max_value=100.0, step=1.0, format="%.1f", key=item)
-    if nota > 0:
+    usar = st.checkbox(f"Lançar nota de {item}?", key=f"check_{item}")
+
+    if usar:
+        nota = st.number_input(
+            f"Nota de {item} (0 a 100)",
+            min_value=0.0,
+            max_value=100.0,
+            step=1.0,
+            key=f"nota_{item}"
+        )
         pontos = (nota / 100) * peso
         notas[item] = pontos
         total += pontos
     else:
         pesos_abertos[item] = peso
 
+
 st.subheader("Resultado")
+
 st.write(f"**Sua nota atual:** {total:.2f}")
 
 if total >= META:
@@ -54,6 +65,6 @@ else:
     st.info(f"✨ Total ainda possível: **{possivel} pontos**")
 
     if possivel >= falta:
-        st.success("💡 Ainda dá para passar! 💪")
+        st.success("💡 Ainda dá para passar! Continue preenchendo o que falta.")
     else:
-        st.error("⚠ Mesmo fazendo tudo, talvez não alcance 70. Consulte a professora para atividades extras.")
+        st.error("⚠ Mesmo com tudo, talvez não alcance 70. Consulte a professora para atividades extras.")
